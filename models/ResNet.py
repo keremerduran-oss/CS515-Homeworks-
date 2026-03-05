@@ -72,11 +72,16 @@ class BasicBlock(nn.Module):
                 """
                 self.shortcut = LambdaLayer(lambda x:
                                             F.pad(x[:, :, ::2, ::2], (0, 0, 0, 0, channels//4, channels//4), "constant", 0))
+                # The slicing x[:, :, ::2, ::2] performs downsampling by taking every second pixel in height and width dimensions.
+                # (1, 16, 32, 32) → (1, 16, 16, 16) after slicing.
+                # Format: (padding_left, padding_right, padding_top, padding_bottom, padding_channel_left, padding_channel_right).
+                # (1, 16, 16, 16) → (1, 32, 16, 16) after padding channels from 16 to 32, channels//4 = 32//4 = 8 zeros added to the left and right of the channel dimension
             elif option == 'B':
                 self.shortcut = nn.Sequential(
                      nn.Conv2d(in_channels, self.expansion * channels, kernel_size=1, stride=stride, bias=False),
                      norm(self.expansion * channels)
                 )
+                # (1, 16, 32, 32) → (1, 32, 16, 16) after 1×1 convolution with stride=2 and output channels=32.
 
     def forward(self, x):
         out = F.relu(self.bn1(self.conv1(x)))
@@ -169,6 +174,3 @@ class ResNet(nn.Module):
         out = out.view(out.size(0), -1)
         out = self.linear(out)
         return out
-
-
-
