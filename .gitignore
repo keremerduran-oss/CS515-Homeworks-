@@ -1,7 +1,9 @@
-data/
+HW3/data/
+HW3/models/saved/
 models/__pycache__/
 best_model.pth
 __pycache__/
-models/saved/
+models/saved_hw1
+models/saved_v2_hw1
 *.pth
 .vscode/
